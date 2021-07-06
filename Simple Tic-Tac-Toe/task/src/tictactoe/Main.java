@@ -14,44 +14,77 @@ public class Main {
             {2, 4, 6}
     };
 
+    static char whoseMove = 'X';
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String st = scanner.nextLine();
-        char[][] cells = {{st.charAt(0), st.charAt(1), st.charAt(2)},
-                {st.charAt(3), st.charAt(4), st.charAt(5)},
-                {st.charAt(6), st.charAt(7), st.charAt(8)}};
-        printCells(cells);
+        char[][] cells = {{'_', '_', '_'},
+                {'_', '_', '_'},
+                {'_', '_', '_'}};
+
+        startGame(scanner, cells);
 
         askToEnterCoordinatesAndCheckThem(scanner, cells);
 
 
     }
 
+    public static void startGame(Scanner scanner, char[][] cells) {
+        printCells(cells);
+        askToEnterCoordinatesAndCheckThem(scanner, cells);
+    }
+
     public static void askToEnterCoordinatesAndCheckThem(Scanner scanner, char[][] cells) {
         System.out.println("Enter the coordinates: ");
         String xy = scanner.nextLine().replaceAll(" ", "");
 
-        if (!isNumbers(xy)) {
+        if (!isInputCoordinatesNumbers(xy)) {
             System.out.println("You should enter numbers!");
             askToEnterCoordinatesAndCheckThem(scanner, cells);
+        } else if (isInputCoordinatesOutOf1to3(xy)) {
+            System.out.println("Coordinates should be from 1 to 3!");
+            askToEnterCoordinatesAndCheckThem(scanner, cells);
+        } else if (isCellOccupy(cells, xy)) {
+            System.out.println("This cell is occupied! Choose another one!");
+            askToEnterCoordinatesAndCheckThem(scanner, cells);
         } else {
-            int x = Character.getNumericValue(xy.charAt(0));
-            int y = Character.getNumericValue(xy.charAt(1));
-            if (x < 1 || x > 3 || y < 1 || y > 3) {
-                System.out.println("Coordinates should be from 1 to 3!");
-                askToEnterCoordinatesAndCheckThem(scanner, cells);
-            } else if (cells[x - 1][y - 1] == 'X' || cells[x - 1][y - 1] == 'O') {
-                System.out.println("This cell is occupied! Choose another one!");
-                askToEnterCoordinatesAndCheckThem(scanner, cells);
-            } else {
-                cells[x - 1][y - 1] = 'X';
-                printCells(cells);
-            }
+            makeMove(cells, xy);
+            printCells(cells);
+            printResult(cells);
+            askToEnterCoordinatesAndCheckThem(scanner, cells);
+
         }
     }
 
-    public static boolean isNumbers(String xy) {
+    public static void makeMove(char[][] cells, String xy) {
+        int x = Character.getNumericValue(xy.charAt(0));
+        int y = Character.getNumericValue(xy.charAt(1));
+        cells[x - 1][y - 1] = whoseMove;
+        changeMove();
+    }
+
+    public static void changeMove() {
+        if (whoseMove == 'X') {
+            whoseMove = 'O';
+        } else if (whoseMove == 'O') {
+            whoseMove = 'X';
+        }
+    }
+
+    public static boolean isInputCoordinatesNumbers(String xy) {
         return xy.matches("\\d+");
+    }
+
+    public static boolean isInputCoordinatesOutOf1to3(String xy) {
+        int x = Character.getNumericValue(xy.charAt(0));
+        int y = Character.getNumericValue(xy.charAt(1));
+        return x < 1 || x > 3 || y < 1 || y > 3;
+    }
+
+    public static boolean isCellOccupy(char[][] cells, String xy) {
+        int x = Character.getNumericValue(xy.charAt(0));
+        int y = Character.getNumericValue(xy.charAt(1));
+        return cells[x - 1][y - 1] == 'X' || cells[x - 1][y - 1] == 'O';
     }
 
 
@@ -63,8 +96,8 @@ public class Main {
         System.out.println("---------");
     }
 
-    public static void printResult(String st) {
-
+    public static void printResult(char[][] cells) {
+        String st = String.valueOf(cells[0]) + String.valueOf(cells[1]) + String.valueOf(cells[2]);
         String LineForCountO = st;
         String LineForCountX = st;
         int countO = LineForCountO.replaceAll("O", "").length();
@@ -74,13 +107,17 @@ public class Main {
             System.out.println("Impossible");
         } else if (isXWins(st) && !isOWins(st)) {
             System.out.println("X wins");
+            System.exit(0);
         } else if (!isXWins(st) && isOWins(st)) {
             System.out.println("O wins");
+            System.exit(0);
         } else if (!isEmpty(st) && !isOWins(st) && !isXWins(st)) {
             System.out.println("Draw");
-        } else if (isEmpty(st) && !isOWins(st) && !isXWins(st)) {
-            System.out.println("Game not finished");
+            System.exit(0);
         }
+//        else if (isEmpty(st) && !isOWins(st) && !isXWins(st)) {
+//            System.out.println("Game not finished");
+//        }
 
     }
 
@@ -89,6 +126,7 @@ public class Main {
     }
 
     public static boolean isOWins(String st) {
+
         for (int[] winC : winCells) {
             if (st.charAt(winC[0]) == 'O' && st.charAt(winC[1]) == 'O' && st.charAt(winC[2]) == 'O') {
                 return true;
