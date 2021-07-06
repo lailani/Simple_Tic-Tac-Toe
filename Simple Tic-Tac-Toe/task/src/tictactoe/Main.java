@@ -1,6 +1,5 @@
 package tictactoe;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -18,35 +17,41 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         String st = scanner.nextLine();
-//        System.out.println("---------");
-//        System.out.printf("| %c %c %c |\n", st.charAt(0), st.charAt(1), st.charAt(2));
-//        System.out.printf("| %c %c %c |\n", st.charAt(3), st.charAt(4), st.charAt(5));
-//        System.out.printf("| %c %c %c |\n", st.charAt(6), st.charAt(7), st.charAt(8));
-//        System.out.println("---------");
         char[][] cells = {{st.charAt(0), st.charAt(1), st.charAt(2)},
                 {st.charAt(3), st.charAt(4), st.charAt(5)},
                 {st.charAt(6), st.charAt(7), st.charAt(8)}};
         printCells(cells);
 
+        askToEnterCoordinatesAndCheckThem(scanner, cells);
 
+
+    }
+
+    public static void askToEnterCoordinatesAndCheckThem(Scanner scanner, char[][] cells) {
         System.out.println("Enter the coordinates: ");
-        String xSt = scanner.nextLine();
-        String ySt = scanner.nextLine();
+        String xy = scanner.nextLine().replaceAll(" ", "");
 
-        if (!xSt.matches("\\d") || !ySt.matches("\\d")) {
+        if (!isNumbers(xy)) {
             System.out.println("You should enter numbers!");
+            askToEnterCoordinatesAndCheckThem(scanner, cells);
         } else {
-            int x = Integer.parseInt(xSt);
-            int y = Integer.parseInt(ySt);
+            int x = Character.getNumericValue(xy.charAt(0));
+            int y = Character.getNumericValue(xy.charAt(1));
             if (x < 1 || x > 3 || y < 1 || y > 3) {
                 System.out.println("Coordinates should be from 1 to 3!");
+                askToEnterCoordinatesAndCheckThem(scanner, cells);
             } else if (cells[x - 1][y - 1] == 'X' || cells[x - 1][y - 1] == 'O') {
                 System.out.println("This cell is occupied! Choose another one!");
+                askToEnterCoordinatesAndCheckThem(scanner, cells);
             } else {
                 cells[x - 1][y - 1] = 'X';
                 printCells(cells);
             }
         }
+    }
+
+    public static boolean isNumbers(String xy) {
+        return xy.matches("\\d+");
     }
 
 
